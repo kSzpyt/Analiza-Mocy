@@ -3,27 +3,21 @@
 
 library(dplyr)
 library(tidyr)
+library(fBasics)
 library(tseries)
-source("s2.R")
+source("losowanie.R")
+#source("s2.R")
 
-foo <- foo
+#foo <- foo
 
 
 
-l <- c(5, 10, 20, 50)
+l <- c(8, 10, 20, 50)
 n <- 1000
 alpha <- 0.05
 
+dane <- gen(l)
 
-dane <- lapply(l, function(x)
-{
-  list("ts" = rt(x, 2), 
-       "unif" = runif(x, 1, 5), 
-       "exp" = rexp(x)
-       )
-  
-}) 
-names(dane) <- c("5el", "10el", "20el", "50el")
 
 ############## sztos
 
@@ -49,10 +43,10 @@ for (a in 1:length(l))
 {
   pvalues <- lapply(dane[[a]], function(x)
   {
-    list("sh" = shapiro.test(x)$p.value,
+    list("sw" = shapiro.test(x)$p.value,
          "jb" = jarque.bera.test(x)$p.value)
   })
-  tib <- rbind(tib, c(pvalues, a))
+  
   
 }
 
@@ -68,15 +62,28 @@ bm[[1]]
 cbind
 
 
-
+df <- data.frame()
 
 pvalues <- lapply(dane[[1]], function(x)
 {
-  list("sh" = shapiro.test(x)$p.value,
+  list("sw" = shapiro.test(x)$p.value,
        "jb" = jarque.bera.test(x)$p.value)
 })
+df <- rbind(df, as.data.frame(pvalues))
+x <- data.frame()
+x <- rbind(x, a)
+a <- as.data.frame(pvalues)
+as_tibble(a)
 
-pvalues[[1]]
+
+##########
+tib2 <- data.frame("sw" = 0, "jb" = 0)
+tib2 <- rbind(tib2, c(0, 0), c(0, 0))
+rownames(tib2) <- c("ts", "unif", "exp")
+##########
+
+dane[[1]]
+pvalues[[1]][1]
 
 
 aaa <- dane[[1]]
@@ -94,8 +101,54 @@ lapply(aaa, function(x)
 
 
 
+x<- c(1:20)
+
+df <- data.frame()
+for (a in l)
+{
+  for (b in 1:n) 
+  {
+    data <- gen(l)
+    pvalues <- lapply(data[[1]], function(x)
+    {
+      list("sw" = shapiroTest(x)@test$p.value,
+           "jb" = jarqueberaTest(x)@test$p.value,
+           "ks" = ksnormTest(x)@test$p.value[1],
+           "chi" = pchiTest(x)@test$p.value[1],
+           "ad" = adTest(x)@test$p.value[1])
+    })
+   df <- rbind(df, c(as.data.frame(pvalues), "length" = a))
+    
+  }
+}
+
+df <- cbind(df[,-length(df)] < alpha, "length" = df[,length(df)])
+df <- as_tibble(df)
+df2 <- df %>%
+  group_by(length) %>%
+  summarise_all(funs(mean))
+df
+df2
+
+df[1,]
 
 
 
 
+
+
+
+
+
+
+
+a <- ksnormTest(rnorm(50))
+a
+str(a)
+a@test$p.value[1]
+
+
+ks.test(x)
+
+ksnormTest(x)
 
