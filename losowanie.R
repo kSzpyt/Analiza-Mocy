@@ -4,8 +4,8 @@ gen <- function(y)
   dane <- lapply(l, function(x)
   {
     list("ts" = rt(x, 2), 
-         "unif" = runif(x, 1, 5), 
-         "exp" = rexp(x)
+         "unif" = runif(x, -1, 1), 
+         "exp" = rexp(x, 10000)
     )
     
   }) 
