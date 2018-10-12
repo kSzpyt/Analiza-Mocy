@@ -8,7 +8,7 @@ library(tseries)
 source("losowanie.R")
 
 
-l <- c(8, 10, 20, 50)
+l <- c(10, 20, 50, 100)
 n <- 1000
 alpha <- 0.05
 
