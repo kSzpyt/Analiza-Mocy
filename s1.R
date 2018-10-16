@@ -61,21 +61,15 @@ mali
 
 Sys.time() - now
 
-data1 <- as_tibble(mali[[1]])
-data1 %>%
-  ggplot() + 
-  geom_bar(x = "ts")
-
-
-
-aaa <- data1[1,][[3]][[1]]
-ggplot(data = aaa, aes(x = ts))+
-  geom_bar(stat="identity")
-
 
 halp <- as_tibble(halp)
+halp2 <- cbind(halp[,-length(halp)] < alpha, "length" = halp[,length(halp)])
 
-pomocy <- halp[which(halp$length == 10), 1:5]
+halp3 <- halp2 %>%
+  group_by(length) %>%
+  summarise_all(funs(mean))
+
+pomocy <- halp3[which(halp3$length == 50), 7:11]
 
 aa <- as_tibble(melt(pomocy))
 aa %>%
@@ -85,9 +79,6 @@ aa %>%
 
 
 
-halp[,1:5] %>%
-  ggplot() + 
-  geom_bar(aes(x = 1:4000, y = factor))
 
 
 
