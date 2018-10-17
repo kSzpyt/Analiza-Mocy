@@ -69,22 +69,25 @@ halp3 <- halp2 %>%
   group_by(length) %>%
   summarise_all(funs(mean))
 
-pomocy <- halp3[which(halp3$length == 50), 7:11]
+charts <- list(0, 0, 0, 0)
 
-aa <- as_tibble(melt(pomocy))
-aa %>%
-  ggplot(aes(x = variable, y = value)) + 
-  geom_bar(stat="identity") + 
-  coord_flip()
-
-
-
-
-
-
-
-
-
-
+for (x in 1:4)
+{
+  pomocy <- halp3[which(halp3$length == l[x]),-1]
+  
+  aa <- as_tibble(melt(pomocy))
+  aa <- aa %>%
+    separate(variable, c("test", "dist"))
+  
+  a <- aa %>%
+    ggplot(aes(x = dist, y = value, fill = test)) + 
+    geom_bar(stat="identity", position = position_dodge()) + 
+    coord_flip()+
+    geom_text(aes(label = value), size = 4.5, position = position_dodge(0.9)) +
+    scale_fill_brewer(palette="Paired")
+  
+  charts[[x]] <- a
+}
+charts
 
 
