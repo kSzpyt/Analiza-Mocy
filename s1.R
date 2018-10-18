@@ -84,7 +84,8 @@ for (x in 1:4)
     geom_bar(stat="identity", position = position_dodge()) + 
     coord_flip()+
     geom_text(aes(label = value), size = 4.5, position = position_dodge(0.9)) +
-    scale_fill_brewer(palette="Paired")
+    scale_fill_brewer(palette="Paired") +
+    labs(title = paste0("Długość próbki: ", l[x])) 
   
   charts[[x]] <- a
 }
