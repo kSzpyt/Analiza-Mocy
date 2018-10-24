@@ -7,6 +7,7 @@ library(fBasics)
 library(tseries)
 library(ggplot2)
 library(reshape2)
+library(tidyverse)
 source("losowanie.R")
 
 
@@ -83,9 +84,9 @@ for (x in 1:4)
     ggplot(aes(x = dist, y = value, fill = test)) + 
     geom_bar(stat="identity", position = position_dodge()) + 
     coord_flip()+
-    geom_text(aes(label = value), size = 4.5, position = position_dodge(0.9)) +
+    geom_text(aes(label = value), size = 4.5, position = position_dodge(0.9), hjust = -0.2, color = "black") +
     scale_fill_brewer(palette="Paired") +
-    labs(title = paste0("Długość próbki: ", l[x])) 
+    labs(title = paste0("Długość próbki: ", l[x]))
   
   charts[[x]] <- a
 }
