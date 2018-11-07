@@ -9,6 +9,5 @@ gen <- function(y)
     )
     
   }) 
-  #names(dane) <- c("5el", "10el", "20el", "50el")
   return(dane)
 }

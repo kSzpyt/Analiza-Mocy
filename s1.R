@@ -10,7 +10,7 @@ library(reshape2)
 library(tidyverse)
 source("losowanie.R")
 
-
+now <- Sys.time()
 l <- c(10, 20, 50, 100)
 n <- 1000
 alpha <- 0.05
@@ -18,7 +18,7 @@ alpha <- 0.05
 
 ############## sztos
 ###########################################################
-now <- Sys.time()
+
 df <- data.frame()
 for (a in l)
 {
@@ -38,7 +38,7 @@ for (a in l)
   }
 }
 
-halp <- df
+df_pomoc <- df
 df <- cbind(df[,-length(df)] < alpha, "length" = df[,length(df)])
 df <- as_tibble(df)
 df2 <- df %>%
@@ -60,23 +60,23 @@ for (c in 1:4)
 names(mali) <- l
 mali
 
-Sys.time() - now
 
 
-halp <- as_tibble(halp)
-halp2 <- cbind(halp[,-length(halp)] < alpha, "length" = halp[,length(halp)])
 
-halp3 <- halp2 %>%
+df_pomoc <- as_tibble(df_pomoc)
+df_pomoc2 <- cbind(df_pomoc[,-length(df_pomoc)] < alpha, "length" = df_pomoc[,length(df_pomoc)])
+
+df_pomoc3 <- df_pomoc2 %>%
   group_by(length) %>%
   summarise_all(funs(mean))
 
 charts <- list(0, 0, 0, 0)
 
-for (x in 1:4)
+for (x in 1:length(l))
 {
-  pomocy <- halp3[which(halp3$length == l[x]),-1]
+  aaa <- df_pomoc3[which(df_pomoc3$length == l[x]),-1]
   
-  aa <- as_tibble(melt(pomocy))
+  aa <- as_tibble(melt(aaa))
   aa <- aa %>%
     separate(variable, c("test", "dist"))
   
@@ -92,4 +92,4 @@ for (x in 1:4)
 }
 charts
 
-
+Sys.time() - now
