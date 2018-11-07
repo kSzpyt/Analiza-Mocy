@@ -1,0 +1,123 @@
+---
+title: "Analiza Mocy"
+author: "Karol Szpyt"
+date: "7 listopada 2018"
+output: html_document
+---
+#Wstęp  
+Praca ta ma za zadanie pokazać jak zmieniają się moce testów w zależności od kolejno: 
+
+* długości próby- 10, 20, 50, 100  
+* rozkład próby- t studenta, wykładniczy oraz jednostajny  
+  
+Poniżej wymienione są pakiety, które zostały użyte w tym badaniu.
+```{r pakiety, message=FALSE, warning=FALSE}
+library(dplyr)
+library(tidyr)
+library(fBasics)
+library(tseries)
+library(ggplot2)
+library(reshape2)
+library(tidyverse)
+library(kableExtra)
+```
+
+Liczba symulacji ustawiona została na 1000 powtórzeń, a poziom istotności na 5%.
+```{r parametry}
+len <- c(10, 20, 50, 100)
+sym <- 1000
+alpha <- 0.05
+```  
+Dla czystości kodu stworzona została funckja losująca próbę (jednocześnie ze wszystkich trzech rozkładów)
+```{r losowanie}
+gen <- function(y)
+{
+  dane <- lapply(y, function(x)
+  {
+    list("ts" = rt(x, 2), 
+         "unif" = runif(x, -1, 1), 
+         "exp" = rexp(x, 10000)
+    )
+    
+  }) 
+  return(dane)
+}
+```
+Wykorzystana następnie w głównej części pracy, czyli pętli obliczającej p-value ze wszystkich testów
+```{r core}
+df <- data.frame()
+for (a in len)
+{
+  for (b in 1:sym) 
+  {
+    data <- gen(a)
+    pvalues <- lapply(data[[1]], function(x)
+    {
+      list("sw" = shapiroTest(x)@test$p.value,
+           "jb" = jarqueberaTest(x)@test$p.value,
+           "ks" = ksnormTest(x)@test$p.value[1],
+           "chi" = pchiTest(x)@test$p.value[1],
+           "ad" = adTest(x)@test$p.value[1])
+    })
+    df <- rbind(df, c(as.data.frame(pvalues), "length" = a))
+    
+  }
+}
+```
+  
+```{r kosmetyka, include=FALSE}
+df_pomoc <- df
+
+df <- cbind(df[,-length(df)] < alpha, "length" = df[,length(df)])
+df <- as_tibble(df)
+df2 <- df %>%
+  group_by(length) %>%
+  summarise_all(funs(mean))
+
+mali <- list()
+for (c in 1:4)
+  {
+  m <- matrix(df2[c,-1], ncol = 5, byrow = TRUE)
+  m <- as.data.frame(m)
+  colnames(m) <- c("sw", "jb", "ks", "chi", "ad")
+  rownames(m) <- c("ts", "unif", "exp")
+  mali[[c]] <- m
+  
+}
+```
+Po uporządkowaniu danych przedstawiają się one następująco  
+
+```{r echo=FALSE}
+mali[[1]] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "float_left") %>%
+  column_spec(2:6, width = "5em") %>%
+  add_header_above(c(" ",  "wielkość próbki- 10" = 5))
+
+mali[[2]] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "float_left") %>%
+  column_spec(2:6, width = "5em") %>%
+  add_header_above(c(" ",  "wielkość próbki- 20" = 5))
+
+mali[[3]] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "float_left") %>%
+  column_spec(2:6, width = "5em") %>%
+  add_header_above(c(" ",  "wielkość próbki- 50" = 5))
+
+mali[[4]] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "float_left") %>%
+  column_spec(2:6, width = "5em") %>%
+  add_header_above(c(" ",  "wielkość próbki- 100" = 5))
+```  
+  
+Poniżej wizualizacja na wykresach
+```{r}
+
+```
+
+
+
+

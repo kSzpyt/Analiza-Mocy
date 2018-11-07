@@ -11,8 +11,8 @@ library(tidyverse)
 source("losowanie.R")
 
 now <- Sys.time()
-l <- c(10, 20, 50, 100)
-n <- 1000
+len <- c(10, 20, 50, 100)
+sym <- 1000
 alpha <- 0.05
 
 
@@ -20,9 +20,9 @@ alpha <- 0.05
 ###########################################################
 
 df <- data.frame()
-for (a in l)
+for (a in len)
 {
-  for (b in 1:n) 
+  for (b in 1:sym) 
   {
     data <- gen(a)
     pvalues <- lapply(data[[1]], function(x)
@@ -57,7 +57,7 @@ for (c in 1:4)
   
 }
 
-names(mali) <- l
+names(mali) <- len
 mali
 
 
@@ -72,9 +72,9 @@ df_pomoc3 <- df_pomoc2 %>%
 
 charts <- list(0, 0, 0, 0)
 
-for (x in 1:length(l))
+for (x in 1:length(len))
 {
-  aaa <- df_pomoc3[which(df_pomoc3$length == l[x]),-1]
+  aaa <- df_pomoc3[which(df_pomoc3$length == len[x]),-1]
   
   aa <- as_tibble(melt(aaa))
   aa <- aa %>%
@@ -86,7 +86,7 @@ for (x in 1:length(l))
     coord_flip()+
     geom_text(aes(label = value), size = 4.5, position = position_dodge(0.9), hjust = -0.2, color = "black") +
     scale_fill_brewer(palette="Paired") +
-    labs(title = paste0("Długość próbki: ", l[x]))
+    labs(title = paste0("Długość próbki: ", len[x]))
   
   charts[[x]] <- a
 }
