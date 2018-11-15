@@ -3,16 +3,19 @@
 
 library(dplyr)
 library(tidyr)
-library(fBasics)
+#library(fBasics)
 library(tseries)
 library(ggplot2)
 library(reshape2)
 library(tidyverse)
+library(nortest)
 source("losowanie.R")
+
+set.seed(2137)
 
 now <- Sys.time()
 len <- c(10, 20, 50, 100)
-sym <- 1000
+sym <- 100
 alpha <- 0.05
 
 
@@ -27,11 +30,12 @@ for (a in len)
     data <- gen(a)
     pvalues <- lapply(data[[1]], function(x)
     {
-      list("sw" = shapiroTest(x)@test$p.value,
-           "jb" = jarqueberaTest(x)@test$p.value,
-           "ks" = ksnormTest(x)@test$p.value[1],
-           "chi" = pchiTest(x)@test$p.value[1],
-           "ad" = adTest(x)@test$p.value[1])
+      list(
+           "sw" = shapiro.test(x)$p.value,
+           "jb" = jarque.bera.test(x)$p.value,
+           "li" = lillie.test(x)$p.value,
+           "chi" = pearson.test(x)$p.value,
+           "ad" = ad.test(x)$p.value)
     })
     df <- rbind(df, c(as.data.frame(pvalues), "length" = a))
     
@@ -51,7 +55,7 @@ for (c in 1:4)
   {
   m <- matrix(df2[c,-1], ncol = 5, byrow = TRUE)
   m <- as.data.frame(m)
-  colnames(m) <- c("sw", "jb", "ks", "chi", "ad")
+  colnames(m) <- c("sw", "jb", "li", "chi", "ad")
   rownames(m) <- c("ts", "unif", "exp")
   mali[[c]] <- m
   
@@ -93,3 +97,10 @@ for (x in 1:length(len))
 charts
 
 Sys.time() - now
+
+
+
+
+plot(dnorm(seq(-10,10,0.01)), type = "l")
+plot(dexp(seq(-10,10,0.01)))
+plot(dunif(seq(-10,10,0.01)))
