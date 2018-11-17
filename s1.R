@@ -9,6 +9,8 @@ library(ggplot2)
 library(reshape2)
 library(tidyverse)
 library(nortest)
+library(Hmisc)
+library(car)
 source("losowanie.R")
 
 set.seed(2137)
@@ -98,9 +100,53 @@ charts
 
 Sys.time() - now
 
+#lieliefors
+x <- seq(from=-10, to=10, by=.1)
+y <- pnorm(x)
+plot(x, y, type='l')
+
+dat10 <- gen(10)
+dat20 <- gen(20)
+dat500 <- gen(50)
+dat100 <- gen(100)
+dat <- gen(c(10, 20, 50 ,100))
+a <- dat[[1]][[1]]
+length(a)
+
+
+par(mfrow = c(1,3))
+plot(ecdf(dat10[[1]][[1]]))
+lines(x, y, type='l', col = "red", lwd = 4)
+
+plot(ecdf(dat10[[1]][[2]]))
+lines(x, y, type='l', col = "red", lwd = 4)
+
+#to jest zajebiste
+#porównanie dystrybuant
+x <- seq(from=-10, to=10, by=.1)
+y <- pnorm(x)
+par(mfrow = c(4,3))
+for (m in 1:4) {
+  for (n in 1:3) {
+    plot(ecdf(dat[[m]][[n]]), main = paste(as.character(names(dat[[m]][n])), as.character(length(dat[[m]][[n]]))))
+    lines(x, y, type='l', col = "red", lwd = 4)
+  }
+}
+##############
+qqnorm(y = rnorm(100))
+qqPlot(dat20[[1]][[1]])
+qqPlot(qnorm(seq(0.01,0.99,0.01)))
+
+qqplot(dnorm(ppoints(20)), dat20[[1]][[1]])
+qqline(dnorm(ppoints(20)))
+qqnorm(sort(dat20[[1]][[1]]))
 
 
 
-plot(dnorm(seq(-10,10,0.01)), type = "l")
-plot(dexp(seq(-10,10,0.01)))
-plot(dunif(seq(-10,10,0.01)))
+
+
+par(mfrow = c(2, 2))
+plot(dnorm(seq(-10,10,0.01)), main = "norm")
+plot(dt(seq(-10, 10, 0.01), 2), main = "t-studnet")
+plot(dexp(seq(-10,10,0.01), 1), main = "exp")
+plot(dunif(seq(-10,10,0.01)), main = "unif")

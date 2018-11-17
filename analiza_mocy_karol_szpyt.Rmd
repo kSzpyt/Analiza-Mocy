@@ -9,6 +9,14 @@ Praca ta ma za zadanie pokazać jak zmieniają się moce testów w zależności 
 
 * długości próby- 10, 20, 50, 100  
 * rozkładu próby- t studenta, wykładniczy oraz jednostajny  
+
+W badaniu użyte zostały następujące testy:
+
+ * test Shapiro Wilka  
+ * test Lielieforsa- modyfikacja testy Kołgomirova- Smirnova. Nie potrzebna jest informacja o śreniej oraz odchyleniu standardowym badanej próby w przeciwiństwie do KS testu. Test bada różnice między dystrybuantą empiryczną a teoretyczną
+ * test Jarque- Bera
+ * test Pearsona
+ * test Andersona-Darlinga
   
 Poniżej wymienione są pakiety, które zostały użyte w tym badaniu.
 ```{r pakiety, message=FALSE, warning=FALSE}
@@ -96,7 +104,7 @@ Przypomnienie oznaczeń:
  * **sw**  - test Shapiro-Wilka
  * **li**  - test Lilliefors'a
  * **jb**  - test Jarque-Bera
- * **chi** - test chi kwadrat
+ * **chi** - test Pearsona
  * **ad**  - test Anderson-Darling'a  
 
 
