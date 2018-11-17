@@ -17,7 +17,7 @@ set.seed(2137)
 
 now <- Sys.time()
 len <- c(10, 20, 50, 100)
-sym <- 100
+sym <- 1000
 alpha <- 0.05
 
 
@@ -131,6 +131,7 @@ for (m in 1:4) {
   for (n in 1:3) {
     plot(ecdf(dat[[m]][[n]]), main = paste(as.character(names(dat[[m]][n])), as.character(length(dat[[m]][[n]]))))
     lines(x, y, type='l', col = "red", lwd = 4)
+    lines(ecdf(rnorm(100)), type='l', col = "blue", lwd = 4)
   }
 }
 ##############
@@ -155,15 +156,33 @@ for (m in 1:4) {
   }
 }
 
-dat <- gen(c(10, 20, 50 ,100))
+set.seed(110)
+z <- 100
+dat <- gen(z)
 par(mfrow = c(2, 2))
-plot(density(rnorm(100)))
-plot(density(dat[[4]][[1]]))
-plot(density(dat[[4]][[2]]))
-plot(density(dat[[4]][[3]]))
+plot(density(rnorm(z)), main = "norm")
+lines(density(rnorm(10000000)), main = "norm", col = "red")
+plot(density(dat[[1]][[1]]), main = "t-studnet")
+lines(density(rnorm(10000000)), main = "norm", col = "red")
+plot(density(dat[[1]][[2]]), main = "unif")
+lines(density(rnorm(10000000)), main = "norm", col = "red")
+plot(density(dat[[1]][[3]]), main = "exp")
+lines(density(rnorm(10000000)), main = "norm", col = "red")
 
-plot(density(dat[[4]][[1]]))
-plot(density(rt(150, 2)))
+z <- 100
+x <- seq(from=-10, to=10, by=.1)
+y <- pnorm(x)
+set.seed(110)
+dat <- gen(z)
+par(mfrow = c(2, 2))
+plot(ecdf(rnorm(z)), main = "norm")
+lines(x, y, type='l', col = "red", lwd = 4)
+plot(ecdf(dat[[1]][[1]]), main = "t-studnet")
+lines(x, y, type='l', col = "red", lwd = 4)
+plot(ecdf(dat[[1]][[2]]), main = "unif")
+lines(x, y, type='l', col = "red", lwd = 4)
+plot(ecdf(dat[[1]][[3]]), main = "exp")
+lines(x, y, type='l', col = "red", lwd = 4)
 
 
 par(mfrow = c(2, 2))

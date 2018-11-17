@@ -4,20 +4,10 @@ author: "Karol Szpyt"
 date: "7 listopada 2018"
 output: html_document
 ---
-#Wstęp  
-Praca ta ma za zadanie pokazać jak zmieniają się moce testów w zależności od kolejno: 
-
-* długości próby- 10, 20, 50, 100  
-* rozkładu próby- t studenta, wykładniczy oraz jednostajny  
-
-W badaniu użyte zostały następujące testy:
-
- * test Shapiro Wilka- test bazuje na wykresach typu kwantyl-kwantyl
- * test Lillieforsa- test bada różnice między dystrybuantą empiryczną a teoretyczną. Jest to modyfikacja testu Kołgomirova- Smirnova. W przeciwiństwie do KS testu nie potrzebna jest informacja o śreniej oraz odchyleniu standardowym badanej próby. 
- * test Jarque- Bera
- * test Pearsona
- * test Andersona-Darlinga- test bazujący na różnicach między dystrybuantami
-  
+```{r include=FALSE}
+now <- Sys.time()
+```
+###Pakiety  
 Poniżej wymienione są pakiety, które zostały użyte w tym badaniu.
 ```{r pakiety, message=FALSE, warning=FALSE}
 library(dplyr)
@@ -28,7 +18,79 @@ library(ggplot2)
 library(reshape2)
 library(tidyverse)
 library(kableExtra)
+library(Hmisc)
+```  
+
+###Wstęp  
+Praca ta ma za zadanie pokazać jak zmieniają się moce testów w zależności od kolejno: 
+
+* **długości** próby- 10, 20, 50, 70, 100, 200
+* **rozkładu** próby- t studenta, wykładniczy oraz jednostajny  
+
+W badaniu użyte zostały następujące testy:
+
+ * test Shapiro Wilka- test bazuje na wykresach typu kwantyl-kwantyl
+ * test Lillieforsa- test bada różnice między dystrybuantą empiryczną a teoretyczną. Jest to modyfikacja testu Kołmogorowa-Smirnowa. W przeciwiństwie do KS testu nie potrzebna jest informacja o śreniej oraz odchyleniu standardowym badanej próby. 
+ * test Jarque- Bera
+ * test Pearson'a
+ * test Andersona-Darlinga- test bazujący na różnicach między dystrybuantami
+ 
+Badanie przeprowadzone zostanie poprzez empiryczne wyznaczenie mocy poszczególnych testów. Wyniki następnie zostaną porównane.  
+```{r include=FALSE}
+gen <- function(y)
+{
+  dane <- lapply(y, function(x)
+  {
+    list("ts" = rt(x, 2), 
+         "unif" = runif(x, -1, 1), 
+         "exp" = rexp(x, 1)
+    )
+    
+  }) 
+  return(dane)
+}
 ```
+
+###Hipoteza  
+####Dystrybuanta
+```{r echo=FALSE, fig.align='center'}
+z <- 100
+x <- seq(from=-10, to=10, by=.1)
+y <- pnorm(x)
+set.seed(110)
+dat <- gen(z)
+par(mfrow = c(2, 2))
+plot(ecdf(rnorm(z)), main = "norm")
+lines(x, y, type='l', col = "red", lwd = 4)
+plot(ecdf(dat[[1]][[1]]), main = "t-studnet")
+lines(x, y, type='l', col = "red", lwd = 4)
+plot(ecdf(dat[[1]][[2]]), main = "unif")
+lines(x, y, type='l', col = "red", lwd = 4)
+plot(ecdf(dat[[1]][[3]]), main = "exp")
+lines(x, y, type='l', col = "red", lwd = 4)
+```  
+Czerwoną linią zaznaczona jest teoretyczna dystybuanta rozkładu normalnego. Na czarno widnieją dystybuanty wyliczone bezpośrednio z próby (100 elementowej) dzięki funkcji **ecdf()** z pakietu Hmisc. 
+ 
+####Gęstość
+```{r echo=FALSE, fig.align='center'}
+set.seed(110)
+z <- 100
+dat <- gen(z)
+par(mfrow = c(2, 2))
+plot(density(rnorm(z)), main = "norm")
+lines(density(rnorm(10000000)), main = "norm", col = "red", lwd = 4)
+plot(density(dat[[1]][[1]]), main = "t-studnet")
+lines(density(rnorm(10000000)), main = "norm", col = "red", lwd = 4)
+plot(density(dat[[1]][[2]]), main = "unif")
+lines(density(rnorm(10000000)), main = "norm", col = "red", lwd = 4)
+plot(density(dat[[1]][[3]]), main = "exp")
+lines(density(rnorm(10000000)), main = "norm", col = "red", lwd = 4)
+```
+Podobna sytuacja co wyżej, z tym że dotycząca gęstości.  
+  
+Po przyjrzeniu się powyższym wykresom można będzie sie spodziewać, że testy najczęściej mylić się będą przy badaniu próby pochodzącej z rozkładu t-studenta co skutkować powinno zmniejszoną mocą testu. 
+
+###Badanie  
 
 Liczba symulacji ustawiona została na 1000 powtórzeń, a poziom istotności na 5%.
 ```{r parametry}
@@ -36,8 +98,8 @@ len <- c(10, 20, 50, 70, 100, 200)
 sym <- 10
 alpha <- 0.05
 ```  
-Dla czystości kodu stworzona została funckja losująca próbę (jednocześnie ze wszystkich trzech rozkładów)
-```{r losowanie}
+Funckja losująca próbę (jednocześnie ze wszystkich trzech rozkładów):
+```{r losowanie, eval = FALSE}
 gen <- function(y)
 {
   dane <- lapply(y, function(x)
@@ -94,7 +156,8 @@ for (c in 1:length(len))
   
 }
 names(mali) <- len
-```
+```  
+###Empirycznie wyznaczone moce testów
 Po uporządkowaniu danych przedstawiają się one następująco.   
 Przypomnienie oznaczeń: 
 
@@ -137,13 +200,13 @@ mali[[5]] %>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "float_left") %>%
   column_spec(2:6, width = "5em") %>%
-  add_header_above(c(" ",  "wielkość próbki- 50" = 5))
+  add_header_above(c(" ",  "wielkość próbki- 100" = 5))
 
 mali[[6]] %>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "right") %>%
   column_spec(2:6, width = "5em") %>%
-  add_header_above(c(" ",  "wielkość próbki- 70" = 5))
+  add_header_above(c(" ",  "wielkość próbki- 200" = 5))
 ```    
 Powyższe tabele prezentują p-value w zależności poszczególnych czynników.  
 Poniżej wizualizacja powyższych wyników na wykresach
@@ -183,7 +246,16 @@ p3 <- charts[[3]]
 p4 <- charts[[4]]
 p5 <- charts[[5]]
 p6 <- charts[[6]]
-grid
+p1
+p2
+p3
+p4
+p5
+p6
+```
+czas kompilacji
+```{r echo=FALSE}
+Sys.time() - now
 ```
 
 
