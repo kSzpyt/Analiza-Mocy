@@ -133,16 +133,17 @@ for (m in 1:4) {
   }
 }
 ##############
-qqnorm(y = rnorm(100))
-qqPlot(dat20[[1]][[1]])
-qqPlot(qnorm(seq(0.01,0.99,0.01)))
 
-qqplot(dnorm(ppoints(20)), dat20[[1]][[1]])
-qqline(dnorm(ppoints(20)))
-qqnorm(sort(dat20[[1]][[1]]))
-
-
-
+#zajebiscie x2
+#to mam dla shapiro
+par(mfrow = c(4,3))
+for (m in 1:4) {
+  for (n in 1:3) {
+    qqnorm(dat[[m]][[n]],  main = paste(as.character(names(dat[[m]][n])), as.character(length(dat[[m]][[n]]))))
+    qqline(rnorm(100), col = "red", lwd = 4)
+  }
+}
+##########################
 
 
 par(mfrow = c(2, 2))
