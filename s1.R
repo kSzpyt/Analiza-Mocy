@@ -76,6 +76,7 @@ df_pomoc3 <- df_pomoc2 %>%
   group_by(length) %>%
   summarise_all(funs(mean))
 
+
 charts <- list(0, 0, 0, 0)
 
 for (x in 1:length(len))
@@ -85,6 +86,9 @@ for (x in 1:length(len))
   aa <- as_tibble(melt(aaa))
   aa <- aa %>%
     separate(variable, c("test", "dist"))
+  
+  aa$test <- as.factor(aa$test)
+  levels(aa$test) <- c("ts", "exp", "unif")
   
   a <- aa %>%
     ggplot(aes(x = dist, y = value, fill = test)) + 
@@ -105,11 +109,8 @@ x <- seq(from=-10, to=10, by=.1)
 y <- pnorm(x)
 plot(x, y, type='l')
 
-dat10 <- gen(10)
-dat20 <- gen(20)
-dat500 <- gen(50)
-dat100 <- gen(100)
-dat <- gen(c(10, 20, 50 ,100))
+
+dat <- gen(c(10, 50, 100 ,200))
 a <- dat[[1]][[1]]
 length(a)
 
@@ -144,10 +145,29 @@ for (m in 1:4) {
   }
 }
 ##########################
+plot(density(dat[[1]][[1]]))
+# tu ejst prbolim
+par(mfrow = c(4,3))
+for (m in 1:4) {
+  for (n in 1:3) {
+    plot(density(dat[[m]][[n]]), main = paste(as.character(names(dat[[m]][n])), as.character(length(dat[[m]][[n]]))))
+    lines(density(rnorm(100)), col = "red", type = "l", lwd = 4)
+  }
+}
+
+dat <- gen(c(10, 20, 50 ,100))
+par(mfrow = c(2, 2))
+plot(density(rnorm(100)))
+plot(density(dat[[4]][[1]]))
+plot(density(dat[[4]][[2]]))
+plot(density(dat[[4]][[3]]))
+
+plot(density(dat[[4]][[1]]))
+plot(density(rt(150, 2)))
 
 
 par(mfrow = c(2, 2))
-plot(dnorm(seq(-10,10,0.01)), main = "norm")
+plot(dnorm(seq(-5,5,length = 100),), main = "norm", type = "l")
 plot(dt(seq(-10, 10, 0.01), 2), main = "t-studnet")
 plot(dexp(seq(-10,10,0.01), 1), main = "exp")
 plot(dunif(seq(-10,10,0.01)), main = "unif")

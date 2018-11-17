@@ -12,11 +12,11 @@ Praca ta ma za zadanie pokazać jak zmieniają się moce testów w zależności 
 
 W badaniu użyte zostały następujące testy:
 
- * test Shapiro Wilka  
- * test Lielieforsa- modyfikacja testy Kołgomirova- Smirnova. Nie potrzebna jest informacja o śreniej oraz odchyleniu standardowym badanej próby w przeciwiństwie do KS testu. Test bada różnice między dystrybuantą empiryczną a teoretyczną
+ * test Shapiro Wilka- test bazuje na wykresach typu kwantyl-kwantyl
+ * test Lillieforsa- test bada różnice między dystrybuantą empiryczną a teoretyczną. Jest to modyfikacja testu Kołgomirova- Smirnova. W przeciwiństwie do KS testu nie potrzebna jest informacja o śreniej oraz odchyleniu standardowym badanej próby. 
  * test Jarque- Bera
  * test Pearsona
- * test Andersona-Darlinga
+ * test Andersona-Darlinga- test bazujący na różnicach między dystrybuantami
   
 Poniżej wymienione są pakiety, które zostały użyte w tym badaniu.
 ```{r pakiety, message=FALSE, warning=FALSE}
@@ -32,7 +32,7 @@ library(kableExtra)
 
 Liczba symulacji ustawiona została na 1000 powtórzeń, a poziom istotności na 5%.
 ```{r parametry}
-len <- c(10, 20, 50, 100)
+len <- c(10, 20, 50, 70, 100, 200)
 sym <- 10
 alpha <- 0.05
 ```  
@@ -44,7 +44,7 @@ gen <- function(y)
   {
     list("ts" = rt(x, 2), 
          "unif" = runif(x, -1, 1), 
-         "exp" = rexp(x, 10000)
+         "exp" = rexp(x, 1)
     )
     
   }) 
@@ -84,7 +84,7 @@ df2 <- df %>%
   summarise_all(funs(mean))
 
 mali <- list()
-for (c in 1:4)
+for (c in 1:length(len))
   {
   m <- matrix(df2[c,-1], ncol = 5, byrow = TRUE)
   m <- as.data.frame(m)
@@ -131,7 +131,19 @@ mali[[4]] %>%
   kable() %>%
   kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "right") %>%
   column_spec(2:6, width = "5em") %>%
-  add_header_above(c(" ",  "wielkość próbki- 100" = 5))
+  add_header_above(c(" ",  "wielkość próbki- 70" = 5))
+
+mali[[5]] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "float_left") %>%
+  column_spec(2:6, width = "5em") %>%
+  add_header_above(c(" ",  "wielkość próbki- 50" = 5))
+
+mali[[6]] %>%
+  kable() %>%
+  kable_styling(bootstrap_options = c("striped", "hover", "bordered"), full_width = FALSE, position = "right") %>%
+  column_spec(2:6, width = "5em") %>%
+  add_header_above(c(" ",  "wielkość próbki- 70" = 5))
 ```    
 Powyższe tabele prezentują p-value w zależności poszczególnych czynników.  
 Poniżej wizualizacja powyższych wyników na wykresach
@@ -165,10 +177,13 @@ for (x in 1:length(len))
 }
 ```
 ```{r echo=FALSE, fig.align="center"}
-charts[[1]]
-charts[[2]]
-charts[[3]]
-charts[[4]]
+p1 <- charts[[1]]
+p2 <- charts[[2]]
+p3 <- charts[[3]]
+p4 <- charts[[4]]
+p5 <- charts[[5]]
+p6 <- charts[[6]]
+grid
 ```
 
 
